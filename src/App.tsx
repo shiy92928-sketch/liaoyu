@@ -12,6 +12,7 @@ const ROOM_HOTSPOTS: Omit<HotspotProps, 'baseOpacity' | 'baseScale' | 'onInterac
   { id: "window", x: 8, y: 5, w: 18, h: 50, label: "窗户", message: "雨滴拍打着玻璃，隔绝了喧嚣，内心如同洗涤过般清澈。" },
   { id: "curtains", x: 0, y: 0, w: 6, h: 80, label: "窗帘", message: "风轻轻拂过，窗帘在光影中婆娑，带来丝丝凉意与宁静。" },
   { id: "paintings", x: 55, y: 10, w: 22, h: 28, label: "海边日落画", message: "目光停留在画框里，夕阳与海浪交织，思绪飘向远方的海岸线。" },
+  { id: "garden_painting", x: 78, y: 15, w: 14, h: 25, label: "花园画", message: "凝视着画里的花园，宛若能闻到草木的清香。" },
   { id: "fishbowl", x: 58, y: 36, w: 6, h: 10, label: "鱼缸", message: "金鱼在水中悠然游动，微小的气泡升腾，生命的律动生生不息。" },
   { id: "lamp", x: 44, y: 25, w: 8, h: 18, label: "台灯", message: "光线柔和，开关之间，情绪随之转换。" },
   { id: "typewriter", x: 38, y: 44, w: 9, h: 10, label: "打字机", message: "指尖敲击键盘，哒哒声清脆悦耳，记录下此刻的灵感与情绪。" },
@@ -128,6 +129,8 @@ export default function App() {
       setExternalIframeUrl('https://1542522.netlify.app');
     } else if (id === 'typewriter') {
       setExternalIframeUrl('https://daziji.netlify.app');
+    } else if (id === 'garden_painting') {
+      setExternalIframeUrl('https://dongtu12.netlify.app');
     }
   };
 
