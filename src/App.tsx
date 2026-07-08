@@ -288,15 +288,39 @@ export default function App() {
             </AnimatePresence>
 
             {/* Global Visibility Toggle */}
-            <motion.button
-              className="absolute top-6 right-6 z-50 p-3 bg-black/40 hover:bg-black/60 rounded-full text-white/50 hover:text-white/90 backdrop-blur-md transition-colors border border-white/10"
-              onClick={() => setControlsVisible(!controlsVisible)}
+            <motion.div
+              className="absolute top-6 right-6 z-50 flex items-center gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2 }}
             >
-              {controlsVisible ? <EyeOff size={20} /> : <Eye size={20} />}
-            </motion.button>
+              <AnimatePresence>
+                {!controlsVisible && (
+                  <motion.span
+                    className="text-white/80 font-light text-xs tracking-wide pointer-events-none drop-shadow-md whitespace-nowrap"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ 
+                      opacity: [0.65, 0.85, 0.65], 
+                      y: [-2, 2, -2] 
+                    }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ 
+                      duration: 4, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                  >
+                    Click the eye to adjust music and sound.
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              <button
+                className="p-3 bg-black/40 hover:bg-black/60 rounded-full text-white/50 hover:text-white/90 backdrop-blur-md transition-colors border border-white/10"
+                onClick={() => setControlsVisible(!controlsVisible)}
+              >
+                {controlsVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </motion.div>
 
             {/* Right Control Panel */}
             <AnimatePresence>
@@ -324,7 +348,7 @@ export default function App() {
                   {/* Sound Settings */}
                   <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
                     <h3 className="font-medium text-white/80 border-b border-white/10 pb-2 text-sm flex items-center gap-2">
-                      <Music size={14} /> Generate Music/White Noise
+                      <Music size={14} /> Music / White Noise
                     </h3>
                     
                     <div className="flex flex-col gap-4">
@@ -332,12 +356,16 @@ export default function App() {
                       <div className="flex flex-col gap-2">
                         <button 
                           onClick={() => {
-                            if (!soundMusic) setSongChoice(Math.floor(Math.random() * 4));
-                            setSoundMusic(!soundMusic);
+                            if (!soundMusic) {
+                              setSongChoice(Math.floor(Math.random() * 3));
+                              setSoundMusic(true);
+                            } else {
+                              setSongChoice(prev => (prev + 1 + Math.floor(Math.random() * 2)) % 3);
+                            }
                           }}
                           className={`py-2 rounded-lg transition-colors border text-center ${soundMusic ? 'bg-white/20 border-white/40 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
                         >
-                          Music {soundMusic && `(Melody ${songChoice + 1})`}
+                          {soundMusic ? `Music: Instrumental ${songChoice + 1}` : 'Music 音乐'}
                         </button>
                         {soundMusic && (
                           <input type="range" min="0" max="2" step="0.1" value={volMusic} onChange={(e) => setVolMusic(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer w-full mt-1" />
