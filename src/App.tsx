@@ -1,4 +1,4 @@
-import { UploadCloud, Eye, EyeOff, ArrowLeft, Music } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Music } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useRef, useEffect } from 'react';
 import AmbientSounds from './components/AmbientSounds';
@@ -7,24 +7,24 @@ import Hotspot, { HotspotProps } from './components/Hotspot';
 import ParticleEffect from './components/ParticleEffect';
 import { audioEngine } from './lib/audio';
 import RainShaderWindow from './components/Scene2';
+import RippleEffect from './components/RippleEffect';
 
 const ROOM_HOTSPOTS: Omit<HotspotProps, 'baseOpacity' | 'baseScale' | 'onInteract'>[] = [
-  { id: "window", x: 8, y: 5, w: 18, h: 50, label: "窗户", message: "雨滴拍打着玻璃，隔绝了喧嚣，内心如同洗涤过般清澈。" },
-  { id: "curtains", x: 0, y: 0, w: 6, h: 80, label: "窗帘", message: "风轻轻拂过，窗帘在光影中婆娑，带来丝丝凉意与宁静。" },
-  { id: "paintings", x: 55, y: 10, w: 22, h: 28, label: "海边日落画", message: "目光停留在画框里，夕阳与海浪交织，思绪飘向远方的海岸线。" },
-  { id: "garden_painting", x: 78, y: 15, w: 14, h: 25, label: "花园画", message: "凝视着画里的花园，宛若能闻到草木的清香。" },
-  { id: "fishbowl", x: 58, y: 36, w: 6, h: 10, label: "鱼缸", message: "金鱼在水中悠然游动，微小的气泡升腾，生命的律动生生不息。" },
-  { id: "lamp", x: 44, y: 25, w: 8, h: 18, label: "台灯", message: "光线柔和，开关之间，情绪随之转换。" },
-  { id: "typewriter", x: 38, y: 44, w: 9, h: 10, label: "打字机", message: "指尖敲击键盘，哒哒声清脆悦耳，记录下此刻的灵感与情绪。" },
-  { id: "fireplace", x: 74, y: 42, w: 23, h: 42, label: "火堆", message: "篝火燃烧，发出噼啪声，温暖了整个房间。" },
-  { id: "boots", x: 64, y: 64, w: 8, h: 17, label: "雨靴", message: "亮黄色的雨靴静静在角落，等待着下一次踏入水洼的雀跃。" },
-  { id: "book", x: 16, y: 81, w: 10, h: 8, label: "白色信纸", message: "白皙的信纸摊开在书桌上，等待着思绪的降落。" },
+  { id: "window", x: 8, y: 5, w: 18, h: 50, label: "Window", message: "Raindrops hit the glass, isolating the noise, making the mind clear as if washed." },
+  { id: "curtains", x: 0, y: 0, w: 6, h: 80, label: "Curtains", message: "The wind gently blows, the curtains dance in the light and shadow, bringing a touch of coolness and peace." },
+  { id: "paintings", x: 55, y: 10, w: 22, h: 28, label: "Seaside Sunset Painting", message: "Eyes rest on the frame, the sunset and waves interweave, thoughts drift to the distant coastline." },
+  { id: "fishbowl", x: 58, y: 36, w: 6, h: 10, label: "Fishbowl", message: "Goldfish swim leisurely in the water, tiny bubbles rise, the rhythm of life is endless." },
+  { id: "lamp", x: 44, y: 25, w: 8, h: 18, label: "Lamp", message: "The light is soft, between on and off, the mood changes." },
+  { id: "typewriter", x: 38, y: 44, w: 9, h: 10, label: "Typewriter", message: "Fingertips hit the keyboard, the clicking sound is crisp and pleasant, recording the inspiration and emotion of the moment." },
+  { id: "fireplace", x: 74, y: 42, w: 23, h: 42, label: "Fireplace", message: "The campfire burns, crackling, warming the whole room." },
+  { id: "boots", x: 64, y: 64, w: 8, h: 17, label: "Boots", message: "Bright yellow rain boots sit quietly in the corner, waiting for the joy of stepping into the puddle next time." },
+  { id: "book", x: 16, y: 81, w: 10, h: 8, label: "White Letter Paper", message: "The white letter paper is spread out on the desk, waiting for thoughts to land." },
 ];
 
 const OUTDOOR_HOTSPOTS: Omit<HotspotProps, 'baseOpacity' | 'baseScale' | 'onInteract'>[] = [
-  { id: "back_to_room", x: 45, y: 45, w: 10, h: 10, label: "返回房间", message: "结束露营，回到温馨的室内。" },
-  { id: "stars", x: 20, y: 10, w: 60, h: 30, label: "星空", message: "无尽的星空让人感到宁静和渺小。" },
-  { id: "campfire_large", x: 40, y: 70, w: 20, h: 25, label: "营火", message: "熊熊燃烧的火焰，驱散了森林的寒冷。" }
+  { id: "back_to_room", x: 45, y: 45, w: 10, h: 10, label: "Back to Room", message: "End the camping and return to the cozy indoors." },
+  { id: "stars", x: 20, y: 10, w: 60, h: 30, label: "Starry Sky", message: "The endless starry sky makes people feel peaceful and small." },
+  { id: "campfire_large", x: 40, y: 70, w: 20, h: 25, label: "Campfire", message: "The blazing fire dispels the cold of the forest." }
 ];
 
 const SCENES = [
@@ -36,33 +36,32 @@ const SCENES = [
   {
     id: "outdoor",
     hotspots: OUTDOOR_HOTSPOTS,
-    image: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop",
+    image: "https://raw.githubusercontent.com/shiy92928-sketch/picture/main/9e832c09-b79e-4d2a-b844-2e5ddd054a85.png",
     zoomOrigin: "50% 50%",
   }
 ];
 
 export default function App() {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>('https://raw.githubusercontent.com/shiy92928-sketch/picture/main/9e832c09-b79e-4d2a-b844-2e5ddd054a85.png');
 
   const [lampOn, setLampOn] = useState<boolean>(true);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [controlsVisible, setControlsVisible] = useState(true);
 
   // Effects Controls
-  const [fireCharSize, setFireCharSize] = useState(6);
-  const [fireWidth, setFireWidth] = useState(19);
-  const [fireHeight, setFireHeight] = useState(20);
-  const [fireSpeed, setFireSpeed] = useState(30);
-  const [fireX, setFireX] = useState(76);
-  const [fireY, setFireY] = useState(60);
+  const [fireCharSize, setFireCharSize] = useState(5);
+  const [fireWidth, setFireWidth] = useState(7);
+  const [fireHeight, setFireHeight] = useState(15);
+  const [fireSpeed, setFireSpeed] = useState(23);
+  const [fireX, setFireX] = useState(84);
+  const [fireY, setFireY] = useState(61);
 
-  const [rainCharSize, setRainCharSize] = useState(14);
-  const [rainWidth, setRainWidth] = useState(22);
+  const [rainCharSize, setRainCharSize] = useState(15);
+  const [rainWidth, setRainWidth] = useState(14);
   const [rainHeight, setRainHeight] = useState(48);
   const [rainSpeed, setRainSpeed] = useState(1.0);
-  const [rainX, setRainX] = useState(5);
-  const [rainY, setRainY] = useState(5);
+  const [rainX, setRainX] = useState(7);
+  const [rainY, setRainY] = useState(2);
 
   const [externalIframeUrl, setExternalIframeUrl] = useState<string | null>(null);
   const [showWindowView, setShowWindowView] = useState(false);
@@ -129,76 +128,16 @@ export default function App() {
       setExternalIframeUrl('https://1542522.netlify.app');
     } else if (id === 'typewriter') {
       setExternalIframeUrl('https://daziji.netlify.app');
-    } else if (id === 'garden_painting') {
-      setExternalIframeUrl('https://dongtu12.netlify.app');
-    }
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const url = URL.createObjectURL(file);
-      setImageSrc(url);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.type.startsWith('image/')) {
-        const url = URL.createObjectURL(file);
-        setImageSrc(url);
-      }
+    } else if (id === 'fishbowl') {
+      setExternalIframeUrl('https://tiny-bienenstitch-0c41e5.netlify.app');
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center overflow-hidden w-full h-full font-sans">
+      <RippleEffect />
       <AnimatePresence mode="wait">
-        {!imageSrc ? (
-          <motion.div
-            key="upload"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="w-full max-w-xl mx-4"
-          >
-            <div 
-              className="group relative flex flex-col items-center justify-center p-16 border-2 border-dashed border-sky-900/50 rounded-3xl bg-slate-900/30 backdrop-blur-sm transition-all hover:bg-slate-900/50 hover:border-sky-500/50 cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
-              
-              <div className="h-20 w-20 rounded-full bg-slate-800 flex items-center justify-center mb-6 shadow-xl border border-slate-700/50 group-hover:scale-110 transition-transform duration-500 ease-out">
-                <UploadCloud className="w-8 h-8 text-sky-400" />
-              </div>
-              
-              <h2 className="text-2xl font-serif text-slate-200 mb-2 tracking-wide">
-                开启疗愈之旅
-              </h2>
-              <p className="text-slate-400 text-center max-w-sm font-light">
-                点击或拖拽上传你的场景图片
-                <br />
-                <span className="text-sm opacity-70 mt-2 block">(请使用原画面以获得最佳交互对应效果)</span>
-              </p>
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
-              />
-            </div>
-          </motion.div>
-        ) : externalIframeUrl ? (
+        {externalIframeUrl ? (
           <motion.div
             key="iframe-container"
             initial={{ opacity: 0 }}
@@ -212,14 +151,14 @@ export default function App() {
                 className="flex items-center gap-2 px-6 py-3 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full text-white hover:text-sky-300 border border-white/20 transition-all text-sm font-medium shadow-2xl"
               >
                 <ArrowLeft size={18} />
-                返回房间
+                Back to Room
               </button>
             </div>
             <iframe 
               src={externalIframeUrl} 
               className="w-full h-full border-none bg-white"
               title="External Interaction"
-              allow="autoplay; fullscreen"
+              allow="camera; microphone; autoplay; fullscreen"
             />
           </motion.div>
         ) : showWindowView ? (
@@ -236,7 +175,7 @@ export default function App() {
                 className="flex items-center gap-2 px-6 py-3 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full text-white hover:text-sky-300 border border-white/20 transition-all text-sm font-medium shadow-2xl"
               >
                 <ArrowLeft size={18} />
-                返回房间
+                Back to Room
               </button>
             </div>
             
@@ -341,6 +280,8 @@ export default function App() {
                     baseOpacity={hotspotOpacity}
                     baseScale={hotspotScale}
                     onInteract={handleInteract}
+                    showSparkles={["typewriter", "boots", "book", "window", "lamp", "fishbowl", "paintings"].includes(hotspot.id)}
+                    lampOn={lampOn}
                   />
                 ))}
               </motion.div>
@@ -369,20 +310,13 @@ export default function App() {
                 >
                   {/* Action Buttons */}
                   <div className="flex flex-col gap-3 pb-2">
-                    <button
-                      onClick={() => setImageSrc(null)}
-                      className="w-full text-center px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl transition-colors font-medium border border-white/5 flex items-center justify-center gap-2"
-                    >
-                      重新选择
-                    </button>
-
                     {currentSceneIndex !== 0 && (
                       <button
                         onClick={() => setCurrentSceneIndex(0)}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl transition-colors font-medium border border-white/5"
                       >
                         <ArrowLeft size={16} />
-                        返回房间
+                        Back to Room
                       </button>
                     )}
                   </div>
@@ -390,7 +324,7 @@ export default function App() {
                   {/* Sound Settings */}
                   <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
                     <h3 className="font-medium text-white/80 border-b border-white/10 pb-2 text-sm flex items-center gap-2">
-                      <Music size={14} /> 生成纯音乐/白噪音
+                      <Music size={14} /> Generate Music/White Noise
                     </h3>
                     
                     <div className="flex flex-col gap-4">
@@ -403,7 +337,7 @@ export default function App() {
                           }}
                           className={`py-2 rounded-lg transition-colors border text-center ${soundMusic ? 'bg-white/20 border-white/40 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
                         >
-                          纯音乐 {soundMusic && `(旋律 ${songChoice + 1})`}
+                          Music {soundMusic && `(Melody ${songChoice + 1})`}
                         </button>
                         {soundMusic && (
                           <input type="range" min="0" max="2" step="0.1" value={volMusic} onChange={(e) => setVolMusic(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer w-full mt-1" />
@@ -416,7 +350,7 @@ export default function App() {
                           onClick={() => setSoundFire(!soundFire)}
                           className={`py-2 rounded-lg transition-colors border text-center ${soundFire ? 'bg-white/20 border-white/40 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
                         >
-                          火堆燃烧声
+                          Fireplace Sound
                         </button>
                         {soundFire && (
                           <input type="range" min="0" max="2" step="0.1" value={volFire} onChange={(e) => setVolFire(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer w-full mt-1" />
@@ -429,7 +363,7 @@ export default function App() {
                           onClick={() => setSoundRain(!soundRain)}
                           className={`py-2 rounded-lg transition-colors border text-center ${soundRain ? 'bg-white/20 border-white/40 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
                         >
-                          下雨声
+                          Rain Sound
                         </button>
                         {soundRain && (
                           <input type="range" min="0" max="2" step="0.1" value={volRain} onChange={(e) => setVolRain(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer w-full mt-1" />
@@ -442,7 +376,7 @@ export default function App() {
                           onClick={() => setSoundWind(!soundWind)}
                           className={`py-2 rounded-lg transition-colors border text-center ${soundWind ? 'bg-white/20 border-white/40 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
                         >
-                          风声
+                          Wind Sound
                         </button>
                         {soundWind && (
                           <input type="range" min="0" max="2" step="0.1" value={volWind} onChange={(e) => setVolWind(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer w-full mt-1" />
@@ -456,7 +390,7 @@ export default function App() {
                     <>
                       <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
                         <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                          <h3 className="font-medium text-white/80 text-sm">火焰设置</h3>
+                          <h3 className="font-medium text-white/80 text-sm">Fireplace Settings</h3>
                           <button 
                             onClick={() => {
                               setFireX(84);
@@ -468,39 +402,39 @@ export default function App() {
                             }}
                             className="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white/70 hover:text-white transition-colors"
                           >
-                            一键设定
+                            Presets
                           </button>
                         </div>
                         
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>X 轴位置</span><span className="text-white/60">{fireX}%</span></label>
+                           <label className="flex justify-between"><span>X Position</span><span className="text-white/60">{fireX}%</span></label>
                            <input type="range" min="0" max="100" value={fireX} onChange={(e) => setFireX(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>Y 轴位置</span><span className="text-white/60">{fireY}%</span></label>
+                           <label className="flex justify-between"><span>Y Position</span><span className="text-white/60">{fireY}%</span></label>
                            <input type="range" min="0" max="100" value={fireY} onChange={(e) => setFireY(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>字符大小</span><span className="text-white/60">{fireCharSize}px</span></label>
+                           <label className="flex justify-between"><span>Character Size</span><span className="text-white/60">{fireCharSize}px</span></label>
                            <input type="range" min="2" max="24" value={fireCharSize} onChange={(e) => setFireCharSize(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>宽度</span><span className="text-white/60">{fireWidth}%</span></label>
+                           <label className="flex justify-between"><span>Width</span><span className="text-white/60">{fireWidth}%</span></label>
                            <input type="range" min="5" max="100" value={fireWidth} onChange={(e) => setFireWidth(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>高度</span><span className="text-white/60">{fireHeight}%</span></label>
+                           <label className="flex justify-between"><span>Height</span><span className="text-white/60">{fireHeight}%</span></label>
                            <input type="range" min="5" max="100" value={fireHeight} onChange={(e) => setFireHeight(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>速度</span><span className="text-white/60">{fireSpeed} fps</span></label>
+                           <label className="flex justify-between"><span>Speed</span><span className="text-white/60">{fireSpeed} fps</span></label>
                            <input type="range" min="5" max="60" value={fireSpeed} onChange={(e) => setFireSpeed(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                       </div>
 
                       <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
                         <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                          <h3 className="font-medium text-white/80 text-sm">字符雨设置</h3>
+                          <h3 className="font-medium text-white/80 text-sm">Matrix Rain Settings</h3>
                           <button 
                             onClick={() => {
                               setRainX(7);
@@ -512,32 +446,32 @@ export default function App() {
                             }}
                             className="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white/70 hover:text-white transition-colors"
                           >
-                            一键设定
+                            Presets
                           </button>
                         </div>
                         
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>X 轴位置</span><span className="text-white/60">{rainX}%</span></label>
+                           <label className="flex justify-between"><span>X Position</span><span className="text-white/60">{rainX}%</span></label>
                            <input type="range" min="0" max="100" value={rainX} onChange={(e) => setRainX(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>Y 轴位置</span><span className="text-white/60">{rainY}%</span></label>
+                           <label className="flex justify-between"><span>Y Position</span><span className="text-white/60">{rainY}%</span></label>
                            <input type="range" min="0" max="100" value={rainY} onChange={(e) => setRainY(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>字符大小</span><span className="text-white/60">{rainCharSize}px</span></label>
+                           <label className="flex justify-between"><span>Character Size</span><span className="text-white/60">{rainCharSize}px</span></label>
                            <input type="range" min="8" max="48" value={rainCharSize} onChange={(e) => setRainCharSize(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>宽度</span><span className="text-white/60">{rainWidth}%</span></label>
+                           <label className="flex justify-between"><span>Width</span><span className="text-white/60">{rainWidth}%</span></label>
                            <input type="range" min="5" max="100" value={rainWidth} onChange={(e) => setRainWidth(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>高度</span><span className="text-white/60">{rainHeight}%</span></label>
+                           <label className="flex justify-between"><span>Height</span><span className="text-white/60">{rainHeight}%</span></label>
                            <input type="range" min="5" max="100" value={rainHeight} onChange={(e) => setRainHeight(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label className="flex justify-between"><span>速度倍率</span><span className="text-white/60">{rainSpeed.toFixed(1)}x</span></label>
+                           <label className="flex justify-between"><span>Speed Multiplier</span><span className="text-white/60">{rainSpeed.toFixed(1)}x</span></label>
                            <input type="range" min="0.1" max="5" step="0.1" value={rainSpeed} onChange={(e) => setRainSpeed(Number(e.target.value))} className="accent-white h-1 bg-white/20 rounded-full outline-none cursor-pointer" />
                         </div>
                       </div>

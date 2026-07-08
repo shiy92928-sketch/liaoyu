@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState } from 'react';
+import StarlightParticles from './StarlightParticles';
 
 export interface HotspotProps {
   key?: React.Key;
@@ -13,9 +14,11 @@ export interface HotspotProps {
   baseOpacity?: number;
   baseScale?: number;
   onInteract?: (id: string) => void;
+  showSparkles?: boolean;
+  lampOn?: boolean;
 }
 
-export default function Hotspot({ id, x, y, w, h, label, message, baseOpacity = 30, baseScale = 100, onInteract }: HotspotProps) {
+export default function Hotspot({ id, x, y, w, h, label, message, baseOpacity = 30, baseScale = 100, onInteract, showSparkles = false, lampOn = false }: HotspotProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
 
@@ -54,6 +57,8 @@ export default function Hotspot({ id, x, y, w, h, label, message, baseOpacity = 
         }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       />
+
+      {showSparkles && <StarlightParticles count={40} isHovered={isHovered} lampOn={lampOn} />}
       
       {/* Ripple on Click */}
       <AnimatePresence>

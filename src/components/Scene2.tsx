@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Settings2, Upload, Droplets, CloudFog, Eye, Play } from 'lucide-react';
+import { Settings2, Upload, Droplets, CloudFog, Eye, Play, Wind, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import FogLayer from './FogLayer';
 
 const vertexShaderSource = `
   attribute vec2 a_position;
@@ -176,22 +177,6 @@ function createProgram(gl: WebGLRenderingContext, vShader: string, fShader: stri
   return program;
 }
 
-const PRESET_MEDIA = [
-  { id: 'grad1', type: 'gradient', url: null, thumb: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=200&h=200&fit=crop', label: '默认流体' },
-  { id: 'img1', type: 'image', url: 'https://images.unsplash.com/photo-1506744626753-1fa44df31c2f?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1506744626753-1fa44df31c2f?w=200&h=200&fit=crop', label: '山谷' },
-  { id: 'img2', type: 'image', url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=200&h=200&fit=crop', label: '森林' },
-  { id: 'city1', type: 'image', url: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=200&h=200&fit=crop', label: '霓虹城市' },
-  { id: 'lights1', type: 'image', url: 'https://images.unsplash.com/photo-1534293230397-c06affcfabeb?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1534293230397-c06affcfabeb?w=200&h=200&fit=crop', label: '散景光斑' },
-  { id: 'img_ocean', type: 'image', url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=200&h=200&fit=crop', label: '深海' },
-  { id: 'img_mist', type: 'image', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=200&h=200&fit=crop', label: '雾山' },
-  { id: 'img_cyber', type: 'image', url: 'https://images.unsplash.com/photo-1515462277126-2dd0c162007a?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1515462277126-2dd0c162007a?w=200&h=200&fit=crop', label: '赛博街道' },
-  { id: 'img_zen', type: 'image', url: 'https://images.unsplash.com/photo-1493905581907-7cc728cf2dc8?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1493905581907-7cc728cf2dc8?w=200&h=200&fit=crop', label: '庭院' },
-  { id: 'img_train', type: 'image', url: 'https://images.unsplash.com/photo-1473654729523-203e25dfabfa?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1473654729523-203e25dfabfa?w=200&h=200&fit=crop', label: '车窗外' },
-  { id: 'img_cafe', type: 'image', url: 'https://images.unsplash.com/photo-1481833758786-ceed163e7071?q=80&w=2070&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1481833758786-ceed163e7071?w=200&h=200&fit=crop', label: '咖啡馆' },
-  { id: 'vid1', type: 'video', url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', thumb: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=200&h=200&fit=crop', label: '营火视频' },
-  { id: 'vid2', type: 'video', url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', thumb: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=200&fit=crop', label: '城市航拍视频' },
-];
-
 export default function RainShaderWindow() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -202,8 +187,11 @@ export default function RainShaderWindow() {
   const [blur, setBlur] = useState(0.3);
   const [refraction, setRefraction] = useState(0.05);
 
-  const [mediaType, setMediaType] = useState<'gradient' | 'image' | 'video'>('gradient');
-  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [marThreshold, setMarThreshold] = useState(0.25);
+  const [smoothingFactor, setSmoothingFactor] = useState(0.55);
+
+  const [mediaType, setMediaType] = useState<'gradient' | 'image' | 'video'>('image');
+  const [mediaUrl, setMediaUrl] = useState<string | null>('https://raw.githubusercontent.com/shiy92928-sketch/picture/main/60e60a16-54d3-4788-a823-b0c44296caa7.png');
 
   const defaultCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -331,10 +319,15 @@ export default function RainShaderWindow() {
   };
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-black overflow-hidden">
+    <div className="absolute inset-0 w-full h-full bg-black overflow-hidden relative">
       <canvas ref={canvasRef} className="w-full h-full block" />
       <canvas ref={defaultCanvasRef} className="hidden" />
       
+      <FogLayer 
+        marThreshold={marThreshold} 
+        smoothingFactor={smoothingFactor} 
+      />
+
       {mediaType === 'video' && mediaUrl && (
         <video 
           ref={videoRef} 
@@ -363,13 +356,13 @@ export default function RainShaderWindow() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <Settings2 className="text-white/60" size={18} />
-                <span className="text-white font-medium tracking-wide">环境参数调节</span>
+                <span className="text-white font-medium tracking-wide">Configuration</span>
               </div>
 
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <Droplets size={14} /> 雨势大小
+                    <Droplets size={14} /> Rain Intensity
                   </label>
                   <input 
                     type="range" min="0" max="1" step="0.01" 
@@ -381,7 +374,7 @@ export default function RainShaderWindow() {
                 
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <CloudFog size={14} /> 窗玻璃雾度
+                    <CloudFog size={14} /> Window Fog
                   </label>
                   <input 
                     type="range" min="0" max="1" step="0.01" 
@@ -393,7 +386,7 @@ export default function RainShaderWindow() {
 
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <Eye size={14} /> 折射率
+                    <Eye size={14} /> Refraction Index
                   </label>
                   <input 
                     type="range" min="0" max="0.2" step="0.01" 
@@ -402,41 +395,30 @@ export default function RainShaderWindow() {
                     className="w-full accent-white" 
                   />
                 </div>
-              </div>
 
-              <div className="border-t border-white/10 pt-4">
-                <label className="text-xs text-white/50 font-medium mb-3 block">预设背景</label>
-                <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30">
-                  {PRESET_MEDIA.map(preset => (
-                    <button
-                      key={preset.id}
-                      onClick={() => {
-                        setMediaType(preset.type as 'gradient' | 'image' | 'video');
-                        setMediaUrl(preset.url);
-                      }}
-                      className="relative shrink-0 w-16 h-16 rounded-lg overflow-hidden group border border-white/10 hover:border-white/50 transition-colors flex items-center justify-center"
-                      title={preset.label}
-                    >
-                      <img src={preset.thumb} alt={preset.label} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
-                      {preset.type === 'video' && (
-                        <Play size={20} className="relative z-10 text-white/80 group-hover:text-white drop-shadow-md" fill="currentColor" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="border-t border-white/10 pt-4">
-                <label className="flex items-center justify-center gap-2 w-full py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-xl cursor-pointer text-white/90 text-sm font-medium">
-                  <Upload size={16} />
-                  <span>更换背景 (图片/视频)</span>
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
+                    <Wind size={14} /> Breath Detection Sensitivity (MAR)
+                  </label>
                   <input 
-                    type="file" 
-                    accept="image/*,video/*" 
-                    className="hidden" 
-                    onChange={handleFileUpload} 
+                    type="range" min="0.1" max="0.5" step="0.01" 
+                    value={marThreshold} 
+                    onChange={e => setMarThreshold(parseFloat(e.target.value))} 
+                    className="w-full accent-white" 
                   />
-                </label>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
+                    <Activity size={14} /> Wiping Smoothing Factor
+                  </label>
+                  <input 
+                    type="range" min="0.01" max="0.5" step="0.01" 
+                    value={smoothingFactor} 
+                    onChange={e => setSmoothingFactor(parseFloat(e.target.value))} 
+                    className="w-full accent-white" 
+                  />
+                </div>
               </div>
             </motion.div>
           )}
