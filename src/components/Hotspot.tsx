@@ -5,8 +5,7 @@ import StarlightParticles from './StarlightParticles';
 export interface HotspotProps {
   key?: React.Key;
   id: string;
-  x: number;
-  y: number;
+  anchor: { x: number; y: number };
   w: number;
   h: number;
   label: string;
@@ -18,11 +17,11 @@ export interface HotspotProps {
   lampOn?: boolean;
 }
 
-export default function Hotspot({ id, x, y, w, h, label, message, baseOpacity = 30, baseScale = 100, onInteract, showSparkles = false, lampOn = false }: HotspotProps) {
+export default function Hotspot({ id, anchor, w, h, label, message, baseOpacity = 30, baseScale = 100, onInteract, showSparkles = false, lampOn = false }: HotspotProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     setIsClicked(true);
     if (onInteract) onInteract(id);
     setTimeout(() => setIsClicked(false), 3000);
@@ -31,15 +30,13 @@ export default function Hotspot({ id, x, y, w, h, label, message, baseOpacity = 
   const scaleRatio = baseScale / 100;
   const adjustedW = w * scaleRatio;
   const adjustedH = h * scaleRatio;
-  const adjustedX = x - (adjustedW - w) / 2;
-  const adjustedY = y - (adjustedH - h) / 2;
 
   return (
-    <div
-      className="absolute group z-20"
+    <motion.div
+      className="absolute group z-20 flex flex-col items-center justify-center"
       style={{
-        left: `${adjustedX}%`,
-        top: `${adjustedY}%`,
+        left: `${anchor.x - adjustedW / 2}%`,
+        top: `${anchor.y - adjustedH / 2}%`,
         width: `${adjustedW}%`,
         height: `${adjustedH}%`,
       }}
@@ -73,37 +70,26 @@ export default function Hotspot({ id, x, y, w, h, label, message, baseOpacity = 
         )}
       </AnimatePresence>
 
-      {/* Tooltip */}
+      {/* Label and Message Popup (On Click) */}
       <AnimatePresence>
-        {isHovered && !isClicked && (
+        {isClicked && (
           <motion.div
-            className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-black/40 backdrop-blur-md text-white/90 px-4 py-1.5 rounded-full text-sm font-medium tracking-wide pointer-events-none border border-white/10"
+            className="absolute bottom-full left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-50 mb-2"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.3 }}
           >
-            {label}
+            <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col items-center min-w-[12rem] max-w-[16rem] text-center shadow-2xl">
+              <span className="text-white/90 text-sm font-medium tracking-wide drop-shadow-md mb-1.5">{label}</span>
+              <p className="text-xs font-light leading-relaxed text-blue-50/90 drop-shadow-md">
+                {message}
+              </p>
+            </div>
+            <div className="w-px h-6 bg-white/40 mt-1" />
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Message Box */}
-      <AnimatePresence>
-        {isClicked && (
-          <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-2xl p-4 rounded-xl w-64 pointer-events-none text-center z-50"
-            initial={{ opacity: 0, scale: 0.9, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            transition={{ duration: 0.5 }}
-          >
-            <p className="text-sm font-light leading-relaxed text-blue-50 drop-shadow-md">
-              {message}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
