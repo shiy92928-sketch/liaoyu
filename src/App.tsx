@@ -176,7 +176,7 @@ export default function App() {
   const getHouseIconUrl = (item: string | null) => {
     switch (item) {
       case 'typewriter': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%876.png';
-      case 'fishbowl': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%876.png';
+      case 'fishbowl': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%875.png';
       case 'paintings': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%871.png';
       case 'boots': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%872.png';
       case 'book': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%874.png';
@@ -197,7 +197,7 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black flex flex-col"
           >
-            <div className="absolute top-6 left-6 z-[60]">
+            <div className="absolute top-6 left-2 z-[60]">
               <button
                 onClick={() => {
                   setExternalIframeUrl(null);
@@ -223,7 +223,7 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black flex flex-col"
           >
-            <div className="absolute top-6 left-6 z-[80]">
+            <div className="absolute top-6 left-2 z-[80]">
               <button
                 onClick={() => {
                   setShowWindowView(false);

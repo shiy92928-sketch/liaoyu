@@ -336,7 +336,7 @@ export default function FogLayer({
             }}
           >
             <h2 
-              className="font-serif mb-4 tracking-wide relative"
+              className="font-pixel mb-4 tracking-wide relative font-bold"
               style={{
                 fontSize: config.title.size,
                 color: config.title.color,
@@ -346,7 +346,7 @@ export default function FogLayer({
               Foggy Window
             </h2>
             <ul 
-              className="space-y-4 font-light tracking-wide mb-8 relative whitespace-normal break-words max-w-full"
+              className="space-y-4 font-pixel tracking-wide mb-8 relative whitespace-normal break-words max-w-full"
               style={{
                 fontSize: config.content.size,
                 color: config.content.color,
@@ -359,7 +359,7 @@ export default function FogLayer({
             </ul>
             <button 
               onClick={() => setShowIntro(false)}
-              className="border border-white/20 rounded-xl transition-all font-medium tracking-widest relative flex items-center justify-center hover:scale-[1.02]"
+              className="border border-white/20 rounded-xl transition-all font-pixel tracking-widest relative flex items-center justify-center hover:scale-[1.02]"
               style={{
                 width: config.btn.w,
                 height: config.btn.h,
