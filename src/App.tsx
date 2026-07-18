@@ -56,7 +56,7 @@ export default function App() {
     }));
   };
 
-  const [imageSrc, setImageSrc] = useState<string | null>('https://raw.githubusercontent.com/shiy92928-sketch/picture/main/9e832c09-b79e-4d2a-b844-2e5ddd054a85.png');
+  const [imageSrc, setImageSrc] = useState<string | null>('https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E8%A7%86%E8%A7%89%E8%AF%97.png');
 
   const [lampOn, setLampOn] = useState<boolean>(true);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
@@ -79,6 +79,7 @@ export default function App() {
 
   const [externalIframeUrl, setExternalIframeUrl] = useState<string | null>(null);
   const [showWindowView, setShowWindowView] = useState(false);
+  const [activeItem, setActiveItem] = useState<string | null>(null);
 
   const hotspotScale = 43;
   const hotspotOpacity = 0;
@@ -92,12 +93,8 @@ export default function App() {
   const [volWind, setVolWind] = useState(0.5);
   const [volFire, setVolFire] = useState(0.3);
   const [volMusic, setVolMusic] = useState(0.5);
-  const [songChoice, setSongChoice] = useState(0);
 
   useEffect(() => {
-    const musicInterval = setInterval(() => {
-      setSongChoice(prev => (prev + 1) % 3);
-    }, 120000); // 2 minutes
 
     // Start audio on first interaction
     const handleFirstInteraction = () => {
@@ -112,7 +109,6 @@ export default function App() {
     window.addEventListener('keydown', handleFirstInteraction);
 
     return () => {
-      clearInterval(musicInterval);
       window.removeEventListener('click', handleFirstInteraction);
       window.removeEventListener('keydown', handleFirstInteraction);
     };
@@ -143,9 +139,9 @@ export default function App() {
   }, [volFire, soundFire]);
 
   useEffect(() => {
-    audioEngine.toggleMusic(soundMusic, volMusic, songChoice);
+    audioEngine.toggleMusic(soundMusic, volMusic);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [soundMusic, songChoice]);
+  }, [soundMusic]);
 
   useEffect(() => {
     if (soundMusic) audioEngine.setMusicVolume(volMusic);
@@ -155,19 +151,37 @@ export default function App() {
     if (id === 'lamp') {
       setLampOn(prev => !prev);
     } else if (id === 'window') {
+      setActiveItem(id);
       setShowWindowView(true);
     } else if (id === 'back_to_room') {
       setCurrentSceneIndex(0);
     } else if (id === 'book') {
+      setActiveItem(id);
       setExternalIframeUrl('https://chuisan.netlify.app');
     } else if (id === 'paintings') {
+      setActiveItem(id);
       setExternalIframeUrl('https://riluoyuhui.netlify.app');
     } else if (id === 'boots') {
+      setActiveItem(id);
       setExternalIframeUrl('https://1542522.netlify.app');
     } else if (id === 'typewriter') {
+      setActiveItem(id);
       setExternalIframeUrl('https://daziji.netlify.app');
     } else if (id === 'fishbowl') {
+      setActiveItem(id);
       setExternalIframeUrl('https://tiny-bienenstitch-0c41e5.netlify.app');
+    }
+  };
+
+  const getHouseIconUrl = (item: string | null) => {
+    switch (item) {
+      case 'typewriter': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%876.png';
+      case 'fishbowl': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%876.png';
+      case 'paintings': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%871.png';
+      case 'boots': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%872.png';
+      case 'book': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%874.png';
+      case 'window': return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%873.png';
+      default: return 'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E6%88%BF%E5%AD%90%E5%9B%BE%E6%A0%876.png';
     }
   };
 
@@ -185,11 +199,13 @@ export default function App() {
           >
             <div className="absolute top-6 left-6 z-[60]">
               <button
-                onClick={() => setExternalIframeUrl(null)}
-                className="flex items-center gap-2 px-6 py-3 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full text-white hover:text-sky-300 border border-white/20 transition-all text-sm font-medium shadow-2xl"
+                onClick={() => {
+                  setExternalIframeUrl(null);
+                  setActiveItem(null);
+                }}
+                className="hover:scale-105 transition-transform"
               >
-                <ArrowLeft size={18} />
-                Back to Room
+                <img src={getHouseIconUrl(activeItem)} alt="Back to Room" className="w-32 h-32 object-contain" />
               </button>
             </div>
             <iframe 
@@ -209,11 +225,13 @@ export default function App() {
           >
             <div className="absolute top-6 left-6 z-[80]">
               <button
-                onClick={() => setShowWindowView(false)}
-                className="flex items-center gap-2 px-6 py-3 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full text-white hover:text-sky-300 border border-white/20 transition-all text-sm font-medium shadow-2xl"
+                onClick={() => {
+                  setShowWindowView(false);
+                  setActiveItem(null);
+                }}
+                className="hover:scale-105 transition-transform"
               >
-                <ArrowLeft size={18} />
-                Back to Room
+                <img src={getHouseIconUrl(activeItem)} alt="Back to Room" className="w-32 h-32 object-contain" />
               </button>
             </div>
             
@@ -324,8 +342,8 @@ export default function App() {
             </AnimatePresence>
 
             {/* Global Audio Prompt */}
-            <div className="absolute top-6 right-6 z-50 text-white/40 text-[10px] font-light pointer-events-none tracking-[0.2em] mix-blend-overlay">
-              ♪ AMBIENT MEMORY
+            <div className="absolute top-6 right-6 z-50 text-white/40 text-[20px] font-pixel pointer-events-none tracking-widest mix-blend-overlay">
+              The wandering room
             </div>
 
             {/* Debug Panel */}

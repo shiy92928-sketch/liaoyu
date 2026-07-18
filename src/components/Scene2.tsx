@@ -182,13 +182,12 @@ export default function RainShaderWindow() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   
-  const [showControls, setShowControls] = useState(false);
-  const [rainAmount, setRainAmount] = useState(0.8);
-  const [blur, setBlur] = useState(0.3);
-  const [refraction, setRefraction] = useState(0.05);
+  const rainAmount = 0.8;
+  const blur = 0.0;
+  const refraction = 0.2;
 
-  const [marThreshold, setMarThreshold] = useState(0.25);
-  const [smoothingFactor, setSmoothingFactor] = useState(0.55);
+  const marThreshold = 0.4;
+  const smoothingFactor = 0.5;
 
   const [mediaType, setMediaType] = useState<'gradient' | 'image' | 'video'>('image');
   const [mediaUrl, setMediaUrl] = useState<string | null>('https://raw.githubusercontent.com/shiy92928-sketch/picture/main/60e60a16-54d3-4788-a823-b0c44296caa7.png');
@@ -343,94 +342,6 @@ export default function RainShaderWindow() {
       {mediaType === 'image' && mediaUrl && (
         <img ref={imgRef} src={mediaUrl} crossOrigin="anonymous" className="hidden" alt="bg" />
       )}
-
-      {/* Control Panel Toggle */}
-      <div className="absolute bottom-8 right-8 z-[70] flex flex-col items-end gap-4">
-        <AnimatePresence>
-          {showControls && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="bg-black/40 backdrop-blur-3xl border border-white/10 rounded-2xl p-6 w-[280px] shadow-2xl flex flex-col gap-6"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <Settings2 className="text-white/60" size={18} />
-                <span className="text-white font-medium tracking-wide">Configuration</span>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <Droplets size={14} /> Rain Intensity
-                  </label>
-                  <input 
-                    type="range" min="0" max="1" step="0.01" 
-                    value={rainAmount} 
-                    onChange={e => setRainAmount(parseFloat(e.target.value))} 
-                    className="w-full accent-white" 
-                  />
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <CloudFog size={14} /> Window Fog
-                  </label>
-                  <input 
-                    type="range" min="0" max="1" step="0.01" 
-                    value={blur} 
-                    onChange={e => setBlur(parseFloat(e.target.value))} 
-                    className="w-full accent-white" 
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <Eye size={14} /> Refraction Index
-                  </label>
-                  <input 
-                    type="range" min="0" max="0.2" step="0.01" 
-                    value={refraction} 
-                    onChange={e => setRefraction(parseFloat(e.target.value))} 
-                    className="w-full accent-white" 
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <Wind size={14} /> Breath Detection Sensitivity (MAR)
-                  </label>
-                  <input 
-                    type="range" min="0.1" max="0.5" step="0.01" 
-                    value={marThreshold} 
-                    onChange={e => setMarThreshold(parseFloat(e.target.value))} 
-                    className="w-full accent-white" 
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs text-white/50 font-medium">
-                    <Activity size={14} /> Wiping Smoothing Factor
-                  </label>
-                  <input 
-                    type="range" min="0.01" max="0.5" step="0.01" 
-                    value={smoothingFactor} 
-                    onChange={e => setSmoothingFactor(parseFloat(e.target.value))} 
-                    className="w-full accent-white" 
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <button 
-          onClick={() => setShowControls(!showControls)}
-          className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 shadow-xl rounded-full text-white transition-all transform hover:scale-105"
-        >
-          <Settings2 size={24} />
-        </button>
-      </div>
     </div>
   );
 }

@@ -84,17 +84,12 @@ export class AudioEngine {
     }
   }
 
-  toggleMusic(play: boolean, vol: number = 1, songChoice: number = 0) {
+  toggleMusic(play: boolean, vol: number = 1) {
     if (play) {
       if (this.musicAudioElement) {
         this.musicAudioElement.pause();
       }
-      const musicUrls = [
-        'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E7%BA%AF%E9%9F%B3%E4%B9%901.mp3',
-        'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E7%BA%AF%E9%9F%B3%E4%B9%902.mp3',
-        'https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E7%BA%AF%E9%9F%B3%E4%B9%903.mp3'
-      ];
-      this.musicAudioElement = new Audio(musicUrls[songChoice % musicUrls.length]);
+      this.musicAudioElement = new Audio('https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E4%B8%BB%E9%A1%B5%E8%83%8C%E6%99%AF%E9%9F%B3%E4%B9%90.mp3');
       this.musicAudioElement.loop = true;
       this.musicAudioElement.volume = Math.max(0, Math.min(1, vol * 0.5));
       this.musicAudioElement.play().catch(() => {});

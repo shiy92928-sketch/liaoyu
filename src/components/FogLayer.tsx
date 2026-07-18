@@ -18,6 +18,13 @@ export default function FogLayer({
   const [isBreathing, setIsBreathing] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
 
+  const [config, setConfig] = useState({
+    panel: { w: 1018, h: 580, x: -34, y: 0 },
+    title: { x: 337, y: 74, size: 31, color: '#3b0193' },
+    content: { x: 189, y: 79, size: 17, color: '#590da5', wordsPerLine: 9 },
+    btn: { x: 303, y: 76, size: 18, color: '#40225d', w: 296, h: 56, bgOpacity: 37, blur: 0, shadow: 31 },
+  });
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRef = useRef({ x: -100, y: -100, isDown: false });
@@ -46,14 +53,15 @@ export default function FogLayer({
       const x = p1.x + (p2.x - p1.x) * t;
       const y = p1.y + (p2.y - p1.y) * t;
       
-      const radGrad = ctx.createRadialGradient(x, y, 0, x, y, 35);
-      radGrad.addColorStop(0, 'rgba(0,0,0,1)');
-      radGrad.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+      const radGrad = ctx.createRadialGradient(x, y, 0, x, y, 45);
+      radGrad.addColorStop(0, 'rgba(0,0,0,0.8)');
+      radGrad.addColorStop(0.3, 'rgba(0,0,0,0.4)');
+      radGrad.addColorStop(0.6, 'rgba(0,0,0,0.1)');
       radGrad.addColorStop(1, 'rgba(0,0,0,0)');
       
       ctx.fillStyle = radGrad;
       ctx.beginPath();
-      ctx.arc(x, y, 35, 0, Math.PI * 2);
+      ctx.arc(x, y, 45, 0, Math.PI * 2);
       ctx.fill();
     }
   };
@@ -225,19 +233,8 @@ export default function FogLayer({
       }
 
       if (isCurrentFramePenDown) {
-        if (!isWipeActiveRef.current) {
-          const dist = Math.hypot(targetX - lastHandPosRef.current.x, targetY - lastHandPosRef.current.y);
-          if (dist > 40 || stableStartTimeRef.current === 0) {
-            // Reset timer if moved too much or just started
-            stableStartTimeRef.current = performance.now();
-            lastHandPosRef.current = { x: targetX, y: targetY };
-          } else {
-            const elapsed = performance.now() - stableStartTimeRef.current;
-            if (elapsed > 400) { // Reduce required hold time to 400ms to be more responsive
-              isWipeActiveRef.current = true;
-            }
-          }
-        }
+        // As long as pen is down, wiping is active immediately
+        isWipeActiveRef.current = true;
       } else {
         isWipeActiveRef.current = false;
         stableStartTimeRef.current = 0;
@@ -297,6 +294,20 @@ export default function FogLayer({
     return () => window.removeEventListener('resize', handleResize);
   }, [isReady]);
 
+  const wrapText = (text: string) => {
+    const words = text.split(' ');
+    const lines = [];
+    for (let i = 0; i < words.length; i += config.content.wordsPerLine) {
+      lines.push(words.slice(i, i + config.content.wordsPerLine).join(' '));
+    }
+    return lines.map((line, idx) => (
+      <React.Fragment key={idx}>
+        {line}
+        {idx < lines.length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
   return (
     <div className="absolute inset-0 z-50 pointer-events-none">
       <video
@@ -313,16 +324,52 @@ export default function FogLayer({
 
       {showIntro && (
         <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity duration-500 pointer-events-auto">
-          <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-8 rounded-3xl max-w-md w-full shadow-2xl text-white relative">
-            <h2 className="text-2xl font-serif mb-4 tracking-wide text-sky-200">Foggy Window</h2>
-            <ul className="space-y-4 text-sm text-white/80 font-light tracking-wide mb-8">
-              <li className="flex gap-3"><span className="text-sky-400">💨</span> <span><strong className="text-white font-medium">1.</strong> Move closer and breathe gently: open your mouth near the camera to make a layer of fog appear on the screen.</span></li>
-              <li className="flex gap-3"><span className="text-blue-400">🖌️</span> <span><strong className="text-white font-medium">2.</strong> Raise your index finger to draw: keep your index finger straight and hold it steady for one second to activate the brush. Then draw freely on the fog.</span></li>
-              <li className="flex gap-3"><span className="text-indigo-400">👆</span> <span><strong className="text-white font-medium">3.</strong> Move your finger slowly to wipe the mist and leave traces.</span></li>
+          <div 
+            className="p-8 rounded-3xl relative text-white"
+            style={{
+              backgroundImage: 'url(https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E7%95%8C%E9%9D%A27.png)',
+              backgroundSize: '100% 100%',
+              backgroundRepeat: 'no-repeat',
+              width: config.panel.w,
+              height: config.panel.h,
+              transform: `translate(${config.panel.x}px, ${config.panel.y}px)`,
+            }}
+          >
+            <h2 
+              className="font-serif mb-4 tracking-wide relative"
+              style={{
+                fontSize: config.title.size,
+                color: config.title.color,
+                transform: `translate(${config.title.x}px, ${config.title.y}px)`,
+              }}
+            >
+              Foggy Window
+            </h2>
+            <ul 
+              className="space-y-4 font-light tracking-wide mb-8 relative whitespace-normal break-words max-w-full"
+              style={{
+                fontSize: config.content.size,
+                color: config.content.color,
+                transform: `translate(${config.content.x}px, ${config.content.y}px)`,
+              }}
+            >
+              <li className="flex gap-3"><span className="text-sky-400 shrink-0">💨</span> <span><strong className="text-white font-medium">1.</strong> {wrapText("Move closer and breathe gently: open your mouth near the camera to make a layer of fog appear on the screen.")}</span></li>
+              <li className="flex gap-3"><span className="text-blue-400 shrink-0">🖌️</span> <span><strong className="text-white font-medium">2.</strong> {wrapText("Raise your index finger to draw: keep your index finger straight to activate the brush. The fog will clear wherever you move your finger.")}</span></li>
+              <li className="flex gap-3"><span className="text-indigo-400 shrink-0">👆</span> <span><strong className="text-white font-medium">3.</strong> {wrapText("Move your finger smoothly to wipe the mist and leave continuous soft traces.")}</span></li>
             </ul>
             <button 
               onClick={() => setShowIntro(false)}
-              className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-colors font-medium tracking-widest shadow-inner shadow-white/5"
+              className="border border-white/20 rounded-xl transition-all font-medium tracking-widest relative flex items-center justify-center hover:scale-[1.02]"
+              style={{
+                width: config.btn.w,
+                height: config.btn.h,
+                fontSize: config.btn.size,
+                color: config.btn.color,
+                transform: `translate(${config.btn.x}px, ${config.btn.y}px)`,
+                backgroundColor: `rgba(255, 255, 255, ${config.btn.bgOpacity / 100})`,
+                backdropFilter: `blur(${config.btn.blur}px)`,
+                boxShadow: `0 8px ${config.btn.shadow}px rgba(0,0,0,0.3), inset 0 0 ${config.btn.shadow / 2}px rgba(255,255,255,0.15)`,
+              }}
             >
               Start Experience
             </button>
