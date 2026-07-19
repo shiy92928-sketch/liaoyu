@@ -19,7 +19,7 @@ export default function FogLayer({
   const [showIntro, setShowIntro] = useState(true);
 
   const [config, setConfig] = useState({
-    panel: { w: 1018, h: 580, x: -34, y: 0 },
+    panel: { w: 1018, h: 580, x: 0, y: 0 },
     title: { x: 337, y: 74, size: 31, color: '#3b0193' },
     content: { x: 189, y: 79, size: 17, color: '#590da5', wordsPerLine: 9 },
     btn: { x: 303, y: 76, size: 18, color: '#40225d', w: 296, h: 56, bgOpacity: 37, blur: 0, shadow: 31 },
@@ -327,7 +327,7 @@ export default function FogLayer({
           <div 
             className="p-8 rounded-3xl relative text-white"
             style={{
-              backgroundImage: 'url(https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E7%95%8C%E9%9D%A27.png)',
+              backgroundImage: 'url(https://raw.githubusercontent.com/shiy92928-sketch/picture/main/%E7%95%8C%E9%9D%A22.png)',
               backgroundSize: '100% 100%',
               backgroundRepeat: 'no-repeat',
               width: config.panel.w,
